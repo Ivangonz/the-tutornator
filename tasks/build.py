@@ -11,13 +11,13 @@ def backend(c):
 @task
 def npmdeps(c):
     if os.path.isdir("webapp/node_modules"):
-        c.run('cd webapp && npm install')
-    else:
         pass
+    else:
+        c.run('cd webapp && npm install')
 
 
 @task(pre=(npmdeps,))
-def webapp(c):
+def frontend(c):
     c.run('cd webapp && npm run serve')
 
 
