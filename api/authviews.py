@@ -10,7 +10,8 @@ import json
 @auth.login_required
 def get_auth_token():
     token = g.user.generate_auth_token(600)
-    return jsonify({'token': token.decode('ascii'), 'duration': 600})
+    return jsonify({'token': token, 'duration': 600})
+
 
 @app.route('/api/account')
 @auth.login_required
@@ -20,7 +21,7 @@ def get_account():
         'email': g.user.email, \
         'firstname': g.user.firstname, 'lastname': g.user.lastname, \
         'roles': g.user.roles
-    }) 
+    })
 
 
 @app.route('/api/profile', methods=['PUT'])
@@ -38,12 +39,14 @@ def profile():
         'roles': g.user.roles
     })
 
+
 @app.route('/api/admin/users')
 @auth.login_required(role='admin')
 @auth.login_required
 def user_list():
     users = User.query.all()
     return jsonify(users)
+
 
 @app.route('/api/admin/roles')
 @auth.login_required(role='admin')
@@ -52,7 +55,9 @@ def roles_list():
     roles = Role.query.all()
     return jsonify(roles)
 
+
 ################## Update, Create, Delete User ########################
+
 
 @app.route('/api/admin/user/<id>', methods=['PUT'])
 @auth.login_required(role='admin')
@@ -73,7 +78,7 @@ def updateUser(id):
     try:
         userObj.hash_password(request.json.get('password'))
     except:
-        print("Password param was not passed in json.  So not updating it")    
+        print("Password param was not passed in json.  So not updating it")
     db.session.add(userObj)
     db.session.commit()
     return jsonify({'operation': 'success'})
@@ -91,12 +96,12 @@ def createUser():
     password = request.json.get('password')
 
     if username is None or password is None:
-        abort(400)    # missing arguments
+        abort(400)  # missing arguments
     if User.query.filter_by(username=username).first() is not None:
-        abort(400)    # existing user
-    user = User(username=username,firstname=firstname,lastname=lastname,email=email)
+        abort(400)  # existing user
+    user = User(username=username, firstname=firstname, lastname=lastname, email=email)
     user.hash_password(password)
-    
+
     rolesJSON = request.json.get('roles')
     for role in rolesJSON:
         roleObj = Role.query.filter(Role.id == role['id']).first()
@@ -105,6 +110,7 @@ def createUser():
     db.session.add(user)
     db.session.commit()
     return jsonify({'operation': 'success'})
+
 
 @app.route('/api/admin/user/<id>', methods=['DELETE'])
 @auth.login_required(role='admin')
@@ -116,7 +122,9 @@ def deleteUser(id):
     db.session.commit()
     return jsonify({'operation': 'success'})
 
+
 ################## Update, Create, Delete Role ########################
+
 
 @app.route('/api/admin/role/<id>', methods=['PUT'])
 @auth.login_required(role='admin')
@@ -137,10 +145,11 @@ def createRole():
     print('creating role')
     name = request.json.get('name')
     role = Role(name=name)
-    
+
     db.session.add(role)
     db.session.commit()
     return jsonify({'operation': 'success'})
+
 
 @app.route('/api/admin/role/<id>', methods=['DELETE'])
 @auth.login_required(role='admin')
@@ -153,14 +162,15 @@ def deleteRole(id):
     return jsonify({'operation': 'success'})
 
 
-
 #########################AUTH UTILITY CLASSES (NOT VIEWS, BUT USED BY VIEWS)#################################
+
 
 # See https://blog.miguelgrinberg.com/post/designing-a-restful-api-with-python-and-flask
 # search on 401 replacing with 403
 @auth.error_handler
 def unauthorized():
     return make_response(jsonify({'error': 'Unauthorized access'}), 403)
+
 
 @auth.verify_password
 def verify_password(username_or_token, password):
@@ -174,6 +184,7 @@ def verify_password(username_or_token, password):
     g.user = user
     return True
 
+
 # below needed for role based auth like:
 # @auth.login_required(role='admin')
 # or
@@ -184,7 +195,5 @@ def get_user_roles(user):
     sqlStatement = "SELECT roles.name FROM roles JOIN user_roles ON roles.id=user_roles.role_id JOIN users ON users.id=user_roles.user_id WHERE users.username='" + g.user.username + "'"
     lt = db.engine.execute(sqlStatement)
     # converts tuple list to list:
-    tupleToList = [item for t in lt for item in t] 
+    tupleToList = [item for t in lt for item in t]
     return tupleToList
-
-

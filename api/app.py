@@ -16,7 +16,7 @@ app = Flask(__name__)
 
 # the below should make all routes cross origin enabled
 # see: https://stackoverflow.com/questions/25594893/how-to-enable-cors-in-flask
-CORS(app) 
+CORS(app)
 
 app.config['SECRET_KEY'] = 'the quick brown fox jumps over the lazy dog'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
@@ -26,6 +26,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # extensions
 db = SQLAlchemy(app)
 auth = HTTPBasicAuth()
+
 
 @dataclass
 class User(db.Model):
@@ -43,8 +44,12 @@ class User(db.Model):
     username = db.Column(db.String(32), index=True, nullable=False, unique=True)
     password_hash = db.Column(db.String(64))
     email = db.Column(db.String(255, collation='NOCASE'), nullable=False, unique=True)
-    firstname = db.Column(db.String(100, collation='NOCASE'), nullable=False, server_default='')
-    lastname = db.Column(db.String(100, collation='NOCASE'), nullable=False, server_default='')
+    firstname = db.Column(
+        db.String(100, collation='NOCASE'), nullable=False, server_default=''
+    )
+    lastname = db.Column(
+        db.String(100, collation='NOCASE'), nullable=False, server_default=''
+    )
 
     # Define the relationship to Role via UserRoles
     roles = db.relationship('Role', secondary='user_roles')
@@ -56,18 +61,21 @@ class User(db.Model):
         return check_password_hash(self.password_hash, password)
 
     def generate_auth_token(self, expires_in=600):
-        return jwt.encode(
-            {'id': self.id, 'exp': time.time() + expires_in},
-            app.config['SECRET_KEY'], algorithm='HS256')
+        return jwt.encode({
+            'id': self.id,
+            'exp': time.time() + expires_in
+        },
+                          app.config['SECRET_KEY'],
+                          algorithm='HS256')
 
     @staticmethod
     def verify_auth_token(token):
         try:
-            data = jwt.decode(token, app.config['SECRET_KEY'],
-                              algorithms=['HS256'])
+            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
         except:
             return
         return User.query.get(data['id'])
+
 
 # Define the Role data-model
 @dataclass
@@ -76,9 +84,9 @@ class Role(db.Model):
     id: int
     name: str
 
-
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(50), unique=True)
+
 
 # Define the UserRoles association table
 class UserRoles(db.Model):
@@ -86,17 +94,14 @@ class UserRoles(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     user_id = db.Column(db.Integer(), db.ForeignKey('users.id', ondelete='CASCADE'))
     role_id = db.Column(db.Integer(), db.ForeignKey('roles.id', ondelete='CASCADE'))
-    
-db.create_all()
 
+
+db.create_all()
 
 # Create 'member@example.com' user with no roles
 if not User.query.filter(User.email == 'member@example.com').first():
     user = User(
-        email='member@example.com',
-        firstname='Momo',
-        lastname='Man',
-        username='momoman'            
+        email='member@example.com', firstname='Momo', lastname='Man', username='momoman'
     )
     user.hash_password('blue')
     user.roles.append(Role(name='member'))
@@ -109,7 +114,7 @@ if not User.query.filter(User.email == 'lfernandez@weber.edu').first():
         email='lfernandez@weber.edu',
         firstname='Luke',
         lastname='Fern',
-        username='lfernandez' 
+        username='lfernandez'
     )
     user.hash_password('white')
     user.roles.append(Role(name='admin'))
@@ -119,13 +124,13 @@ if not User.query.filter(User.email == 'lfernandez@weber.edu').first():
 
 ############################################ROUTES ROUTES ROUTES ROUTES##########################################
 import authviews
- 
-# a sample route 
+
+
+# a sample route
 @app.route("/greeting")
 def greeting():
     print(request.headers)
     return {'greeting': request.headers['Authorization']}
-
 
 
 if __name__ == '__main__':
