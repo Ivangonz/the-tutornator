@@ -133,7 +133,7 @@ This is an example of how to list things you need to use the software and how to
    ```
 2. Run the Frontend
    ```sh
-   inv build.webapp
+   inv build.frontend
    ```
 3. Navigate to ```http://localhost:port/```
 
