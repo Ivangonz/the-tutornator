@@ -11,9 +11,9 @@ flask_sqlalchemy = "^2.4.4"
 flask_httpauth = "^4.2.0"
 pyjwt = "^2.0.1"
 flask_cors = "^3.0.10"
+invoke = "^1.5.0"
 
 [tool.poetry.dev-dependencies]
-invoke = "^1.5.0"
 pytest-dotenv = "^0.5.2"
 yapf = "^0.30.0"
 
