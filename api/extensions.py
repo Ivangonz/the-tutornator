@@ -117,9 +117,3 @@ class UserLanguages(db.Model):
     languages_id = db.Column(
         db.Integer(), db.ForeignKey('languages.id', ondelete='CASCADE')
     )
-
-
-#
-# db.create_all()
-#
-# Create 'member@example.com' user with no roles

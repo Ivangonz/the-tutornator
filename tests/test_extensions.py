@@ -4,8 +4,8 @@ import sqlite3
 import pytest
 import random
 
-from api.extensions import Role, User, db
-
+from api.app import app, db
+from api.extensions import User, Role
 
 usernames = [
     "apple", "banana", "cherry", "dragon fruit", "egg fruit", "Farkleberry", "grapefruit",
@@ -30,11 +30,24 @@ passwords = [
 
 
 def test_create_users():
-    for i in range(10):
-        if not User.query.filter(User.email == 'member@example.com').first():
+    db.init_app(app)
+    with app.app_context():
+        for i in range(10):
             user = User(email=emails[i], firstname=first_names[i], lastname=last_names[i], username=usernames[i])
             user.hash_password(passwords[i])
-            user.roles.append(Role(name='member'))
             db.session.add(user)
             db.session.commit()
 
+
+def test_query_users():
+    db.init_app(app)
+    with app.app_context():
+        print(db.session.query(User).all())
+
+
+def test_delete_users():
+    db.init_app(app)
+    with app.app_context():
+        for i in range(10):
+            User.query.filter_by(username=usernames[i]).delete()
+            db.session.commit()
