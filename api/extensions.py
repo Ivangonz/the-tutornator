@@ -15,7 +15,6 @@ class User(db.Model):
     __tablename__ = 'users'
 
     username: str
-    # password_hash: str (we leave this out for security reasons so as not to return it to the browser)
     email: str
     firstname: str
     lastname: str
@@ -34,7 +33,7 @@ class User(db.Model):
         db.String(100, collation='NOCASE'), nullable=False, server_default=''
     )
 
-    # Define the relationship to Role via UserRoles
+    # Define the relationship to outer tables via a bridge table
     roles = db.relationship('Role', secondary='user_roles')
     classes = db.relationship('Class', secondary='user_classes')
     languages = db.relationship('Language', secondary='user_languages')
@@ -102,7 +101,6 @@ class UserClasses(db.Model):
 @dataclass
 class Language(db.Model):
     __tablename__ = 'languages'
-    id: int
     name: str
 
     id = db.Column(db.Integer(), primary_key=True)
