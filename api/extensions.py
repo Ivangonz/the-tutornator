@@ -20,6 +20,8 @@ class User(db.Model):
     firstname: str
     lastname: str
     roles: str
+    classes: str
+    languages: str
 
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(32), index=True, nullable=False, unique=True)
@@ -34,6 +36,8 @@ class User(db.Model):
 
     # Define the relationship to Role via UserRoles
     roles = db.relationship('Role', secondary='user_roles')
+    classes = db.relationship('Class', secondary='user_classes')
+    languages = db.relationship('Language', secondary='user_languages')
 
     def hash_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -74,6 +78,45 @@ class UserRoles(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     user_id = db.Column(db.Integer(), db.ForeignKey('users.id', ondelete='CASCADE'))
     role_id = db.Column(db.Integer(), db.ForeignKey('roles.id', ondelete='CASCADE'))
+
+
+# Define the Class data-model
+@dataclass
+class Class(db.Model):
+    __tablename__ = 'classes'
+    name: str
+
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(50), unique=True)
+
+
+# Define the UserClasses association table
+class UserClasses(db.Model):
+    __tablename__ = 'user_classes'
+    id = db.Column(db.Integer(), primary_key=True)
+    user_id = db.Column(db.Integer(), db.ForeignKey('users.id', ondelete='CASCADE'))
+    class_id = db.Column(db.Integer(), db.ForeignKey('classes.id', ondelete='CASCADE'))
+
+
+# Define the Language data-model
+@dataclass
+class Language(db.Model):
+    __tablename__ = 'languages'
+    id: int
+    name: str
+
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(50), unique=True)
+
+
+# Define the UserLanguages association table
+class UserLanguages(db.Model):
+    __tablename__ = 'user_languages'
+    id = db.Column(db.Integer(), primary_key=True)
+    user_id = db.Column(db.Integer(), db.ForeignKey('users.id', ondelete='CASCADE'))
+    languages_id = db.Column(
+        db.Integer(), db.ForeignKey('languages.id', ondelete='CASCADE')
+    )
 
 
 #
