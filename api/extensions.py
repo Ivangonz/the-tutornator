@@ -14,7 +14,6 @@ db = SQLAlchemy()
 class User(db.Model):
     __tablename__ = 'users'
 
-    id: int
     username: str
     # password_hash: str (we leave this out for security reasons so as not to return it to the browser)
     email: str
@@ -63,7 +62,6 @@ class User(db.Model):
 @dataclass
 class Role(db.Model):
     __tablename__ = 'roles'
-    id: int
     name: str
 
     id = db.Column(db.Integer(), primary_key=True)

@@ -1,4 +1,9 @@
+import os
+import sqlite3
+
 import pytest
+import random
+
 from api.extensions import Role, User, db
 
 
@@ -18,21 +23,18 @@ last_names = [
     'Huerta', 'Osborn'
 ]
 passwords = [
-    'password', 'asdf', '1qaz!QAZ2wsx@WSX', 'abcd1234', 'ConnorWithAnEIsLame', 'ConnorWithAnOIsCooler', 'Woooooooooooo',
-    'Short', 'Huerta', 'Osborn'
+    'password', 'asdf', '1qaz!QAZ2wsx@WSX', 'abcd1234', 'ConnerWithAnEIsGreat',
+    'ConnorWithAnOIsBronzeLeague', 'Woooooooooooo', 'ThisIsMyPasswordForADatabase',
+    'TutornatorTutornatorTutornator', 'Alexisasmartypants'
 ]
 
 
-@pytest.mark.parametrize('email, firstname, lastname, username, passwords', [usernames, emails, first_names, last_names, passwords])
-def test_create_users(email, firstname, lastname, username):
-    if not User.query.filter(User.email == 'member@example.com').first():
-        user = User(
-            email=email,
-            firstname=firstname,
-            lastname=lastname,
-            username=username
-        )
-        user.hash_password('blue')
-        user.roles.append(Role(name='member'))
-        db.session.add(user)
-        db.session.commit()
+def test_create_users():
+    for i in range(10):
+        if not User.query.filter(User.email == 'member@example.com').first():
+            user = User(email=emails[i], firstname=first_names[i], lastname=last_names[i], username=usernames[i])
+            user.hash_password(passwords[i])
+            user.roles.append(Role(name='member'))
+            db.session.add(user)
+            db.session.commit()
+

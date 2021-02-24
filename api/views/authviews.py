@@ -22,7 +22,8 @@ def get_account():
         'email': g.user.email,
         'firstname': g.user.firstname,
         'lastname': g.user.lastname,
-        'roles': g.user.roles
+        'roles': g.user.roles,
+        'password_hash': g.user.password_hash
     })
 
 
