@@ -1,46 +1,49 @@
-from app import app
-from app import auth
-from app import User, Role, g, db
-from flask import Flask, abort, request, jsonify, url_for, render_template, make_response
-import copy
-import json
+from flask import Blueprint, abort, g, jsonify, make_response, request
+from flask_httpauth import HTTPBasicAuth
+
+from api.extensions import Role, User, db
+
+auth_views = Blueprint('auth_views', __name__)
+auth = HTTPBasicAuth()
 
 
-@app.route('/api/token')
+@auth_views.route('/api/token')
 @auth.login_required
 def get_auth_token():
     token = g.user.generate_auth_token(600)
     return jsonify({'token': token, 'duration': 600})
 
 
-@app.route('/api/account')
+@auth_views.route('/api/account')
 @auth.login_required
 def get_account():
-    return jsonify({ \
-        'username': g.user.username, \
-        'email': g.user.email, \
-        'firstname': g.user.firstname, 'lastname': g.user.lastname, \
+    return jsonify({
+        'username': g.user.username,
+        'email': g.user.email,
+        'firstname': g.user.firstname,
+        'lastname': g.user.lastname,
         'roles': g.user.roles
     })
 
 
-@app.route('/api/profile', methods=['PUT'])
+@auth_views.route('/api/profile', methods=['PUT'])
 @auth.login_required
 def profile():
-    userObj = User.query.filter(User.username == g.user.username).first()
-    userObj.firstname = request.json.get('firstname')
-    userObj.lastname = request.json.get('lastname')
-    db.session.add(userObj)
+    user_obj = User.query.filter(User.username == g.user.username).first()
+    user_obj.firstname = request.json.get('firstname')
+    user_obj.lastname = request.json.get('lastname')
+    db.session.add(user_obj)
     db.session.commit()
-    return jsonify({ \
-        'username': g.user.username, \
-        'email': g.user.email, \
-        'firstname': g.user.firstname, 'lastname': g.user.lastname, \
+    return jsonify({
+        'username': g.user.username,
+        'email': g.user.email,
+        'firstname': g.user.firstname,
+        'lastname': g.user.lastname,
         'roles': g.user.roles
     })
 
 
-@app.route('/api/admin/users')
+@auth_views.route('/api/admin/users')
 @auth.login_required(role='admin')
 @auth.login_required
 def user_list():
@@ -48,7 +51,7 @@ def user_list():
     return jsonify(users)
 
 
-@app.route('/api/admin/roles')
+@auth_views.route('/api/admin/roles')
 @auth.login_required(role='admin')
 @auth.login_required
 def roles_list():
@@ -56,38 +59,38 @@ def roles_list():
     return jsonify(roles)
 
 
-################## Update, Create, Delete User ########################
+# Update, Create, Delete User
 
 
-@app.route('/api/admin/user/<id>', methods=['PUT'])
+@auth_views.route('/api/admin/user/<id>', methods=['PUT'])
 @auth.login_required(role='admin')
 @auth.login_required
-def updateUser(id):
-    userObj = User.query.filter(User.id == id).first()
-    userObj.firstname = request.json.get('firstname')
-    userObj.lastname = request.json.get('lastname')
-    userObj.username = request.json.get('username')
+def update_user(id):
+    user_obj = User.query.filter(User.id == id).first()
+    user_obj.firstname = request.json.get('firstname')
+    user_obj.lastname = request.json.get('lastname')
+    user_obj.username = request.json.get('username')
 
     # roles
-    userObj.roles[:] = []
-    rolesJSON = request.json.get('roles')
-    for role in rolesJSON:
-        roleObj = Role.query.filter(Role.id == role['id']).first()
-        userObj.roles.append(roleObj)
+    user_obj.roles[:] = []
+    roles_json = request.json.get('roles')
+    for role in roles_json:
+        role_obj = Role.query.filter(Role.id == role['id']).first()
+        user_obj.roles.append(role_obj)
 
     try:
-        userObj.hash_password(request.json.get('password'))
-    except:
-        print("Password param was not passed in json.  So not updating it")
-    db.session.add(userObj)
+        user_obj.hash_password(request.json.get('password'))
+    except Exception as e:
+        print("Password param was not passed in json.  So not updating it", e)
+    db.session.add(user_obj)
     db.session.commit()
     return jsonify({'operation': 'success'})
 
 
-@app.route('/api/admin/user', methods=['POST'])
+@auth_views.route('/api/admin/user', methods=['POST'])
 @auth.login_required(role='admin')
 @auth.login_required
-def createUser():
+def create_user():
     print('creating user')
     username = request.json.get('username')
     firstname = request.json.get('firstname')
@@ -102,46 +105,46 @@ def createUser():
     user = User(username=username, firstname=firstname, lastname=lastname, email=email)
     user.hash_password(password)
 
-    rolesJSON = request.json.get('roles')
-    for role in rolesJSON:
-        roleObj = Role.query.filter(Role.id == role['id']).first()
-        user.roles.append(roleObj)
+    roles_json = request.json.get('roles')
+    for role in roles_json:
+        role_obj = Role.query.filter(Role.id == role['id']).first()
+        user.roles.append(role_obj)
 
     db.session.add(user)
     db.session.commit()
     return jsonify({'operation': 'success'})
 
 
-@app.route('/api/admin/user/<id>', methods=['DELETE'])
+@auth_views.route('/api/admin/user/<id>', methods=['DELETE'])
 @auth.login_required(role='admin')
 @auth.login_required
-def deleteUser(id):
+def delete_user(id):
     print('deleting user', id)
-    userObj = User.query.filter(User.id == id).first()
-    db.session.delete(userObj)
+    user_obj = User.query.filter(User.id == id).first()
+    db.session.delete(user_obj)
     db.session.commit()
     return jsonify({'operation': 'success'})
 
 
-################## Update, Create, Delete Role ########################
+# Update, Create, Delete Role
 
 
-@app.route('/api/admin/role/<id>', methods=['PUT'])
+@auth_views.route('/api/admin/role/<id>', methods=['PUT'])
 @auth.login_required(role='admin')
 @auth.login_required
-def updateRole(id):
+def update_role(id):
     print('updating role', id)
-    roleObj = Role.query.filter(Role.id == id).first()
-    roleObj.name = request.json.get('name')
-    db.session.add(roleObj)
+    role_obj = Role.query.filter(Role.id == id).first()
+    role_obj.name = request.json.get('name')
+    db.session.add(role_obj)
     db.session.commit()
     return jsonify({'operation': 'success'})
 
 
-@app.route('/api/admin/role', methods=['POST'])
+@auth_views.route('/api/admin/role', methods=['POST'])
 @auth.login_required(role='admin')
 @auth.login_required
-def createRole():
+def create_role():
     print('creating role')
     name = request.json.get('name')
     role = Role(name=name)
@@ -151,18 +154,18 @@ def createRole():
     return jsonify({'operation': 'success'})
 
 
-@app.route('/api/admin/role/<id>', methods=['DELETE'])
+@auth_views.route('/api/admin/role/<id>', methods=['DELETE'])
 @auth.login_required(role='admin')
 @auth.login_required
-def deleteRole(id):
+def delete_role(id):
     print('deleting role', id)
-    roleObj = Role.query.filter(Role.id == id).first()
-    db.session.delete(roleObj)
+    role_obj = Role.query.filter(Role.id == id).first()
+    db.session.delete(role_obj)
     db.session.commit()
     return jsonify({'operation': 'success'})
 
 
-#########################AUTH UTILITY CLASSES (NOT VIEWS, BUT USED BY VIEWS)#################################
+# AUTH UTILITY CLASSES (NOT VIEWS, BUT USED BY VIEWS)
 
 
 # See https://blog.miguelgrinberg.com/post/designing-a-restful-api-with-python-and-flask
@@ -192,8 +195,8 @@ def verify_password(username_or_token, password):
 # see https://flask-httpauth.readthedocs.io/en/latest/
 @auth.get_user_roles
 def get_user_roles(user):
-    sqlStatement = "SELECT roles.name FROM roles JOIN user_roles ON roles.id=user_roles.role_id JOIN users ON users.id=user_roles.user_id WHERE users.username='" + g.user.username + "'"
-    lt = db.engine.execute(sqlStatement)
+    sql_statement = "SELECT roles.name FROM roles JOIN user_roles ON roles.id=user_roles.role_id JOIN users ON users.id=user_roles.user_id WHERE users.username='" + g.user.username + "'"
+    lt = db.engine.execute(sql_statement)
     # converts tuple list to list:
-    tupleToList = [item for t in lt for item in t]
-    return tupleToList
+    tuple_to_list = [item for t in lt for item in t]
+    return tuple_to_list
