@@ -23,7 +23,7 @@ def frontend(c):
 
 @task
 def test(c):
-    c.run('python -m pytest --cov=api/ --color=yes tests/')
+    c.run('python -m pytest --cov=api --color=yes tests/')
 
 
 @task
