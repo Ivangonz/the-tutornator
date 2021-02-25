@@ -1,3 +1,4 @@
+import os
 import time
 from dataclasses import dataclass
 
@@ -6,9 +7,10 @@ from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from api.constants import SECRET_KEY
+from api.utils import encode_img
 
 db = SQLAlchemy()
-
+img_path = os.path.abspath('images/default-avatar.png')
 
 @dataclass
 class User(db.Model):
@@ -21,7 +23,10 @@ class User(db.Model):
     roles: str
     classes: str
     languages: str
+    biography: str
+    avatar: bytes
 
+    # SQLAlchemy will automatically set the first Integer PK column that's not marked as a FK as autoincrement=True.
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(32), index=True, nullable=False, unique=True)
     password_hash = db.Column(db.String(64))
@@ -32,6 +37,9 @@ class User(db.Model):
     lastname = db.Column(
         db.String(100, collation='NOCASE'), nullable=False, server_default=''
     )
+    biography = db.Column(db.String(8000), server_default='')
+    avatar = db.Column(db.BLOB(), server_default=encode_img(img_path))
+
 
     # Define the relationship to outer tables via a bridge table
     roles = db.relationship('Role', secondary='user_roles')
@@ -115,9 +123,3 @@ class UserLanguages(db.Model):
     languages_id = db.Column(
         db.Integer(), db.ForeignKey('languages.id', ondelete='CASCADE')
     )
-
-
-#
-# db.create_all()
-#
-# Create 'member@example.com' user with no roles

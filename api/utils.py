@@ -1,3 +1,5 @@
+import base64
+
 from api.extensions import Role, User, db
 
 
@@ -28,3 +30,9 @@ def create_test_admin():
         user.roles.append(Role(name='agent'))
         db.session.add(user)
         db.session.commit()
+
+
+def encode_img(img_path) -> bytes:
+    with open(img_path, 'rb') as avt:
+        avatar_img = base64.b64encode(avt.read())
+    return avatar_img
