@@ -20,11 +20,12 @@ class User(db.Model):
     email: str
     firstname: str
     lastname: str
+    biography: str
+    avatar: bytes
     roles: str
     classes: str
     languages: str
-    biography: str
-    avatar: bytes
+    schedules: str
 
     # SQLAlchemy will automatically set the first Integer PK column that's not marked as a FK as autoincrement=True.
     id = db.Column(db.Integer, primary_key=True)
@@ -45,6 +46,7 @@ class User(db.Model):
     roles = db.relationship('Role', secondary='user_roles')
     classes = db.relationship('Class', secondary='user_classes')
     languages = db.relationship('Language', secondary='user_languages')
+    schedules = db.relationship('Schedule', secondary='user_schedules')
 
     def hash_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -124,3 +126,14 @@ class UserLanguages(db.Model):
     languages_id = db.Column(
         db.Integer(), db.ForeignKey('languages.id', ondelete='CASCADE')
     )
+
+# Define the Schedule data-model
+@dataclass
+class Schedule(db.Model):
+    __tablename__ = 'Schedules'
+    id = db.Column(db.Integer(), primary_key=True)
+    time_day = db.Column(db.Integer())
+    time_start = db.Column(db.Time())
+    time_end = db.Column(db.Time())
+    # tutor = db.relationship('Tutor', uselist=False)
+    tutor_id = db.Column(db.Integer(), db.ForeignKey('tutor.id', ondelete='CASCADE'))
