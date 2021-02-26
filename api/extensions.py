@@ -15,7 +15,6 @@ class User(db.Model):
     __tablename__ = 'users'
 
     username: str
-    # password_hash: str (we leave this out for security reasons so as not to return it to the browser)
     email: str
     firstname: str
     lastname: str
@@ -57,7 +56,8 @@ class User(db.Model):
     def verify_auth_token(token):
         try:
             data = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
-        except:
+        except Exception as e:
+            print(e)
             return
         return User.query.get(data['id'])
 

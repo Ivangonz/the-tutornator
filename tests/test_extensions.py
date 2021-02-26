@@ -5,7 +5,7 @@ import pytest
 import random
 
 from api.app import app, db
-from api.extensions import User, Role
+from api.extensions import User
 
 usernames = [
     "apple", "banana", "cherry", "dragon fruit", "egg fruit", "Farkleberry", "grapefruit",
@@ -31,6 +31,7 @@ passwords = [
 
 def test_create_users():
     db.init_app(app)
+    print("Generating test users...")
     with app.app_context():
         for i in range(10):
             user = User(email=emails[i], firstname=first_names[i], lastname=last_names[i], username=usernames[i])
@@ -47,6 +48,7 @@ def test_query_users():
 
 def test_delete_users():
     db.init_app(app)
+    print("Cleaning up test users...")
     with app.app_context():
         for i in range(10):
             User.query.filter_by(username=usernames[i]).delete()
