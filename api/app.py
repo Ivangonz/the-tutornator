@@ -6,7 +6,7 @@ from flask_cors import CORS
 
 from api.constants import SECRET_KEY, SQL_ALCHEMY_DATABASE_URI
 from api.extensions import db
-from api.utils import create_test_admin
+# from api.utils import create_test_admin
 from api.views.authviews import auth_views
 
 
@@ -25,7 +25,7 @@ def create_app():
     db.init_app(flask_app)
     with flask_app.app_context():
         db.create_all()
-        create_test_admin()
+        # create_test_admin()
 
     return flask_app
 

@@ -36,7 +36,7 @@ def test_create_users():
         for i in range(10):
             user = User(email=emails[i], firstname=first_names[i], lastname=last_names[i], username=usernames[i])
             user.hash_password(passwords[i])
-            user.roles.append(Role(name='tutor'))
+            user.roles.append('tutor')
             db.session.add(user)
             db.session.commit()
 

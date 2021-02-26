@@ -10,7 +10,7 @@ from api.constants import SECRET_KEY
 from api.utils import encode_img
 
 db = SQLAlchemy()
-img_path = os.path.abspath('images/default-avatar.png')
+img_path = os.path.abspath('api/images/default-avatar.png')
 
 @dataclass
 class User(db.Model):
@@ -20,12 +20,11 @@ class User(db.Model):
     email: str
     firstname: str
     lastname: str
-    biography: str
-    avatar: bytes
-    roles: str
-    classes: str
-    languages: str
-    schedules: str
+    biography: str = ''
+    avatar: bytes = encode_img(img_path)
+    roles: str = ''
+    classes: str = ''
+    languages: str = ''
 
     # SQLAlchemy will automatically set the first Integer PK column that's not marked as a FK as autoincrement=True.
     id = db.Column(db.Integer, primary_key=True)
@@ -39,14 +38,14 @@ class User(db.Model):
         db.String(100, collation='NOCASE'), nullable=False, server_default=''
     )
     biography = db.Column(db.String(8000), server_default='')
-    avatar = db.Column(db.BLOB(), server_default=encode_img(img_path))
+    avatar = db.Column(db.BLOB())
 
 
     # Define the relationship to outer tables via a bridge table
     roles = db.relationship('Role', secondary='user_roles')
     classes = db.relationship('Class', secondary='user_classes')
     languages = db.relationship('Language', secondary='user_languages')
-    schedules = db.relationship('Schedule', secondary='user_schedules')
+    schedules = db.relationship("Schedule", backref='users', cascade='all')
 
     def hash_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -127,13 +126,13 @@ class UserLanguages(db.Model):
         db.Integer(), db.ForeignKey('languages.id', ondelete='CASCADE')
     )
 
+
 # Define the Schedule data-model
 @dataclass
 class Schedule(db.Model):
     __tablename__ = 'Schedules'
     id = db.Column(db.Integer(), primary_key=True)
+    user_id = db.Column(db.Integer(), db.ForeignKey('users.id', ondelete='CASCADE'))
     time_day = db.Column(db.Integer())
     time_start = db.Column(db.Time())
     time_end = db.Column(db.Time())
-    # tutor = db.relationship('Tutor', uselist=False)
-    tutor_id = db.Column(db.Integer(), db.ForeignKey('tutor.id', ondelete='CASCADE'))
