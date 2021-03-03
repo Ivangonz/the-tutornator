@@ -12,6 +12,22 @@ from api.utils import encode_img
 db = SQLAlchemy()
 img_path = os.path.abspath('api/images/default-avatar.png')
 
+
+def create_test_admin():
+    if not User.query.filter(User.email == 'lfernandez@weber.edu').first():
+        user = User(
+            email='lfernandez@weber.edu',
+            firstname='Luke',
+            lastname='Fern',
+            username='lfernandez'
+        )
+        user.hash_password('white')
+        user.roles.append(Role(name='admin'))
+        user.roles.append(Role(name='agent'))
+        db.session.add(user)
+        db.session.commit()
+
+
 @dataclass
 class User(db.Model):
     __tablename__ = 'users'
@@ -39,7 +55,6 @@ class User(db.Model):
     )
     biography = db.Column(db.String(8000), server_default='')
     avatar = db.Column(db.BLOB())
-
 
     # Define the relationship to outer tables via a bridge table
     roles = db.relationship('Role', secondary='user_roles')
