@@ -1,6 +1,6 @@
 import os
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 
 import jwt
 from flask_sqlalchemy import SQLAlchemy
@@ -57,9 +57,9 @@ class User(db.Model):
     avatar = db.Column(db.BLOB())
 
     # Define the relationship to outer tables via a bridge table
-    roles = db.relationship('Role', secondary='user_roles', backref=db.backref('userroles', lazy='dynamic'))
-    courses = db.relationship('Course', secondary='user_courses', backref=db.backref('usercourses', lazy='dynamic'))
-    languages = db.relationship('Language', secondary='user_languages', backref=db.backref('userlanguages', lazy='dynamic'))
+    roles = db.relationship('Role', secondary='user_roles')
+    courses = db.relationship('Course', secondary='user_courses')
+    languages = db.relationship('Language', secondary='user_languages')
     schedules = db.relationship("Schedule", backref='users', cascade='all')
 
     def hash_password(self, password):
@@ -84,6 +84,9 @@ class User(db.Model):
             print(e)
             return
         return User.query.get(data['id'])
+
+    def export(self):
+        return asdict(self)
 
 
 # Define the Role data-model

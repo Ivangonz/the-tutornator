@@ -2,6 +2,7 @@ from flask import Blueprint, abort, g, jsonify, make_response, request
 from flask_httpauth import HTTPBasicAuth
 
 from api.extensions import Role, User, db
+from api.alchemist import Alchemist
 
 auth_views = Blueprint('auth_views', __name__)
 auth = HTTPBasicAuth()

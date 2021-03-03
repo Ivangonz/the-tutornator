@@ -37,50 +37,59 @@ avatar = encode_img('api/images/default-avatar.png')
 roles = [{"admin", "tutor"}, "admin", "tutor", "tutor", "tutor", "tutor", "tutor", "tutor",
          "tutor", "tutor"]
 
-courses = [["CS-1010", "CS1030", "CS-1400", "CS-1410"],
-           ["CS-1010", "CS1030", "CS-1400", "CS-1410", "CS-2130", "CS2350"],
-           ["CS-1010", "CS1030", "CS-1400", "CS-1410", "CS-2130", "CS2350"],
-           ["CS-1010", "CS1030", "CS-1400", "CS-1410", "CS-2130", "CS2350"],
-           [
-               "CS-1010", "CS1030", "CS-1400", "CS-1410", "CS-2130", "CS2350", "CS2420",
-               "CS2450", "CS2550", "CS2705"
-           ],
-           [
-               "CS-1010", "CS1030", "CS-1400", "CS-1410", "CS-2130", "CS2350", "CS2420",
-               "CS2450", "CS2550", "CS2705"
-           ],
-           [
-               "CS-1010", "CS1030", "CS-1400", "CS-1410", "CS-2130", "CS2350", "CS2420",
-               "CS2450", "CS2550", "CS2705", "CS-2810", "CS3280"
-           ],
-           [
-               "CS-1010", "CS1030", "CS-1400", "CS-1410", "CS-2130", "CS2350", "CS2420",
-               "CS2450", "CS2550", "CS2705", "CS-2810", "CS3280"
-           ], {"CS2350", "CS2420", "CS2450", "CS2550", "CS2705", "CS-2810", "CS3280"},
-           [
-               "CS2350", "CS2420", "CS2450", "CS2550", "CS2705", "CS-2810", "CS3280",
-               "CS-3550", "CS-4110"
-           ]]
-
-languages = [["Assembly", "C#", "C++"], ["CSS", "HTML", "JavaScript"], ["Java", "SQL"],
-             ["Assembly", "C#", "C++", "SQL"],
-             ["CSS", "HTML", "JavaScript", "Assembly", "C#", "C++"],
-             ["CSS", "HTML", "JavaScript", "Assembly", "C#", "C++"],
-             ["CSS", "HTML", "JavaScript", "Java", "SQL"],
-             ["Java", "SQL", "Assembly", "C#", "C++"],
-             ["Assembly", "C#", "C++", "CSS", "HTML", "JavaScript", "Java", "SQL"],
-             ["Assembly", "C#", "C++", "CSS", "HTML", "JavaScript", "Java", "SQL"]]
+# courses = [["CS-1010", "CS1030", "CS-1400", "CS-1410"],
+#            ["CS-1010", "CS1030", "CS-1400", "CS-1410", "CS-2130", "CS2350"],
+#            ["CS-1010", "CS1030", "CS-1400", "CS-1410", "CS-2130", "CS2350"],
+#            ["CS-1010", "CS1030", "CS-1400", "CS-1410", "CS-2130", "CS2350"],
+#            [
+#                "CS-1010", "CS1030", "CS-1400", "CS-1410", "CS-2130", "CS2350", "CS2420",
+#                "CS2450", "CS2550", "CS2705"
+#            ],
+#            [
+#                "CS-1010", "CS1030", "CS-1400", "CS-1410", "CS-2130", "CS2350", "CS2420",
+#                "CS2450", "CS2550", "CS2705"
+#            ],
+#            [
+#                "CS-1010", "CS1030", "CS-1400", "CS-1410", "CS-2130", "CS2350", "CS2420",
+#                "CS2450", "CS2550", "CS2705", "CS-2810", "CS3280"
+#            ],
+#            [
+#                "CS-1010", "CS1030", "CS-1400", "CS-1410", "CS-2130", "CS2350", "CS2420",
+#                "CS2450", "CS2550", "CS2705", "CS-2810", "CS3280"
+#            ], {"CS2350", "CS2420", "CS2450", "CS2550", "CS2705", "CS-2810", "CS3280"},
+#            [
+#                "CS2350", "CS2420", "CS2450", "CS2550", "CS2705", "CS-2810", "CS3280",
+#                "CS-3550", "CS-4110"
+#            ]]
+#
+# languages = [["Assembly", "C#", "C++"], ["CSS", "HTML", "JavaScript"], ["Java", "SQL"],
+#              ["Assembly", "C#", "C++", "SQL"],
+#              ["CSS", "HTML", "JavaScript", "Assembly", "C#", "C++"],
+#              ["CSS", "HTML", "JavaScript", "Assembly", "C#", "C++"],
+#              ["CSS", "HTML", "JavaScript", "Java", "SQL"],
+#              ["Java", "SQL", "Assembly", "C#", "C++"],
+#              ["Assembly", "C#", "C++", "CSS", "HTML", "JavaScript", "Java", "SQL"],
+#              ["Assembly", "C#", "C++", "CSS", "HTML", "JavaScript", "Java", "SQL"]]
 
 # schedules=[{{1, }{}},
 # {}]
 # (time_day int, time_start time, time_end time)
 
 
+def test_clean_db():
+    db.init_app(app)
+    with app.app_context():
+        db.drop_all()
+        db.create_all()
+
+
 def test_create_users():
     db.init_app(app)
+
     print("Generating test users...")
     with app.app_context():
-        all_courses = db.session.query(Course).all()
+        db.drop_all()
+        db.create_all()
 
         for i in range(10):
             user = User(
@@ -90,23 +99,48 @@ def test_create_users():
                 username=usernames[i]
             )
             user.hash_password(passwords[i])
-            for j in range(len(courses[i])):
-                course = Course(
-                    name=courses[i][j]
-                )
-                if courses[i][j] in all_courses:
-                    course.usercourses.append(user)
-                else:
-                    user.courses.append(Course(name=courses[i][j]))
 
             db.session.add(user)
             db.session.commit()
+            print('')
+
+
+def test_create_courses():
+    db.init_app(app)
+
+    print("Generating test users...")
+    with app.app_context():
+        # db.drop_all()
+        # db.create_all()
+        # all_courses = db.session.query(Course).all()
+        # print("")
+
+        for i in range(10):
+            number = random.randint(1000, 5000)
+            c = Course(name=f"CS-{number}")
+
+            db.session.add(c)
+            db.session.commit()
+            print('')
+
+
+def test_add_courses_to_user():
+    db.init_app(app)
+
+    print("Generating test users...")
+    with app.app_context():
+        courses = db.session.query(Course).all()
+        users = db.session.query(User).all()
+        for u in users:
+            for c in courses:
+                u.courses.append(c)
 
 
 def test_query_users():
     db.init_app(app)
     with app.app_context():
-        print(db.session.query(User).all())
+        a = db.session.query(User).all()
+        print('')
 
 
 def test_delete_users():
