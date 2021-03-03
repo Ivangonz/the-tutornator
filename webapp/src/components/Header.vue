@@ -13,12 +13,27 @@
         </div>
       </transition>
       <div class="navbar-header">
-        <router-link to="/" class="navbar-brand">Vue-Flask App</router-link>
+        <router-link to="/" class="navbar-brand">Home</router-link>
       </div>
       <div>
         <ul class="nav navbar-nav navbar-right">
           <li v-show="this.$store.getters.authenticated">
             <a href="#" @click="profile">{{ this.$store.state.auth.email }}</a>
+          </li>
+          <li>
+            <a href ="#" @click="calendar">Calendar</a>
+          </li>
+          <li>
+            <a href ="#" @click="tutors">Tutors</a>
+          </li>
+           <li>
+            <a href ="#" @click="login">Login</a>
+          </li>
+           <li>
+            <a href ="#" @click="admintools">Admin Tools</a>
+          </li>
+           <li>
+            <a href ="#" @click="manageaccount">Manage Account</a>
           </li>
           <li v-show="this.$store.getters.authenticated">
             <a href="#" @click="logOut">Logout</a>
@@ -93,6 +108,26 @@ export default {
     profile: function() {
       this.$router.replace({ name: "profile" });
     },
+    calendar: function()
+    {
+      this.$router.replace({ name: "calendar" });
+    },
+    admintools: function()
+    {
+     this.$router.replace({ name: "admintools" });
+    },
+    tutors: function()
+    {
+     this.$router.replace({ name: "tutors" });
+    },
+    manageaccount: function()
+    {
+       this.$router.replace({ name: "manageaccount" });
+    },
+    login: function()
+    {
+      this.$router.replace({ name: "login" });
+    }
   },
 };
 </script>

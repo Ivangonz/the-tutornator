@@ -5,7 +5,6 @@ const state = {
   newRouteRequest: ""
 }
 
-
 const mutations = {
     SET_ALERT: function (state, payload) {
       state.alertType = payload.status;
@@ -18,9 +17,7 @@ const mutations = {
     }
 
   }
-  
-  
-  
+
   export default {
     mutations, state
   }

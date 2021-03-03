@@ -29,6 +29,7 @@
         </div>
 
         <button
+
           class="btn btn-default btn-primary"
           type="button"
           v-on:click="login()"

@@ -12,6 +12,10 @@ import UserEditCreate from './components/secure/admin/UserEditCreate.vue'
 
 import Roles from './components/secure/admin/Roles.vue'
 import RoleEditCreate from './components/secure/admin/RoleEditCreate.vue'
+import Calendar from "@/components/public/Calendar";
+import AdminTools from "@/components/public/AdminTools";
+import Tutors from "@/components/public/Tutors";
+import ManageAccount from "@/components/public/ManageAccount";
 
 
 export const routes = [
@@ -91,11 +95,14 @@ export const routes = [
     ]
 
   },
+  { path: '/calendar', component: Calendar, name: 'calendar'  },
+  { path: '/adminTools', component: AdminTools, name: 'admintools'  },
+  { path: '/tutors', component: Tutors, name: 'tutors'  },
+  { path: '/manageAccount', component: ManageAccount, name: 'manageaccount'},
   { path: '/member', component: Member, name: 'member' },
   { path: '/agent', component: Agent, name: 'agent' },
 
   { path: '/unauthorized', component: Warning, name: 'warning' },
- 
 
 ];
 
