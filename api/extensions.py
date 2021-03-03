@@ -39,7 +39,7 @@ class User(db.Model):
     biography: str = ''
     avatar: bytes = encode_img(img_path)
     roles: str = ''
-    classes: str = ''
+    courses: str = ''
     languages: str = ''
 
     # SQLAlchemy will automatically set the first Integer PK column that's not marked as a FK as autoincrement=True.
@@ -57,9 +57,9 @@ class User(db.Model):
     avatar = db.Column(db.BLOB())
 
     # Define the relationship to outer tables via a bridge table
-    roles = db.relationship('Role', secondary='user_roles')
-    classes = db.relationship('Class', secondary='user_classes')
-    languages = db.relationship('Language', secondary='user_languages')
+    roles = db.relationship('Role', secondary='user_roles', backref=db.backref('userroles', lazy='dynamic'))
+    courses = db.relationship('Course', secondary='user_courses', backref=db.backref('usercourses', lazy='dynamic'))
+    languages = db.relationship('Language', secondary='user_languages', backref=db.backref('userlanguages', lazy='dynamic'))
     schedules = db.relationship("Schedule", backref='users', cascade='all')
 
     def hash_password(self, password):
@@ -106,8 +106,8 @@ class UserRoles(db.Model):
 
 # Define the Class data-model
 @dataclass
-class Class(db.Model):
-    __tablename__ = 'classes'
+class Course(db.Model):
+    __tablename__ = 'courses'
     name: str
 
     id = db.Column(db.Integer(), primary_key=True)
@@ -115,11 +115,11 @@ class Class(db.Model):
 
 
 # Define the UserClasses association table
-class UserClasses(db.Model):
-    __tablename__ = 'user_classes'
+class UserCourses(db.Model):
+    __tablename__ = 'user_courses'
     id = db.Column(db.Integer(), primary_key=True)
     user_id = db.Column(db.Integer(), db.ForeignKey('users.id', ondelete='CASCADE'))
-    class_id = db.Column(db.Integer(), db.ForeignKey('classes.id', ondelete='CASCADE'))
+    course_id = db.Column(db.Integer(), db.ForeignKey('courses.id', ondelete='CASCADE'))
 
 
 # Define the Language data-model
