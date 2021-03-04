@@ -24,5 +24,7 @@ nav{
 div{
     text-align: center;
     font-style: italic;
+    background-color: purple;
+    color: white;
 }
 </style>

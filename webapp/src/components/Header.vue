@@ -13,7 +13,7 @@
         </div>
       </transition>
       <div class="navbar-header">
-        <router-link to="/" class="navbar-brand">Home</router-link>
+        <router-link to="/" class="navbar-brand"><p>Home</p></router-link>
       </div>
       <div>
         <ul class="nav navbar-nav navbar-right">
@@ -21,19 +21,19 @@
             <a href="#" @click="profile">{{ this.$store.state.auth.email }}</a>
           </li>
           <li>
-            <a href ="#" @click="calendar">Calendar</a>
+            <a href ="#" @click="calendar"><p>Calendar</p></a>
           </li>
           <li>
-            <a href ="#" @click="tutors">Tutors</a>
+            <a href ="#" @click="tutors"><p>Tutors</p></a>
           </li>
            <li>
-            <a href ="#" @click="login">Login</a>
+            <a href ="#" @click="login"><p>Login</p></a>
           </li>
            <li>
-            <a href ="#" @click="admintools">Admin Tools</a>
+            <a href ="#" @click="admintools"><p>Admin Tools</p></a>
           </li>
            <li>
-            <a href ="#" @click="manageaccount">Manage Account</a>
+            <a href ="#" @click="manageaccount"><p>Manage Account</p></a>
           </li>
           <li v-show="this.$store.getters.authenticated">
             <a href="#" @click="logOut">Logout</a>
@@ -152,4 +152,21 @@ export default {
 .fade-leave-to {
   opacity: 0;
 }
+.navbar{
+background-color: purple;
+}
+
+.breadcrumb
+{
+visibility: invisible;
+}
+a
+{
+color: red;
+}
+p
+{
+color: white;
+}
+
 </style>
