@@ -37,39 +37,39 @@ avatar = encode_img('api/images/default-avatar.png')
 roles = [{"admin", "tutor"}, "admin", "tutor", "tutor", "tutor", "tutor", "tutor", "tutor",
          "tutor", "tutor"]
 
-# courses = [["CS-1010", "CS1030", "CS-1400", "CS-1410"],
-#            ["CS-1010", "CS1030", "CS-1400", "CS-1410", "CS-2130", "CS2350"],
-#            ["CS-1010", "CS1030", "CS-1400", "CS-1410", "CS-2130", "CS2350"],
-#            ["CS-1010", "CS1030", "CS-1400", "CS-1410", "CS-2130", "CS2350"],
-#            [
-#                "CS-1010", "CS1030", "CS-1400", "CS-1410", "CS-2130", "CS2350", "CS2420",
-#                "CS2450", "CS2550", "CS2705"
-#            ],
-#            [
-#                "CS-1010", "CS1030", "CS-1400", "CS-1410", "CS-2130", "CS2350", "CS2420",
-#                "CS2450", "CS2550", "CS2705"
-#            ],
-#            [
-#                "CS-1010", "CS1030", "CS-1400", "CS-1410", "CS-2130", "CS2350", "CS2420",
-#                "CS2450", "CS2550", "CS2705", "CS-2810", "CS3280"
-#            ],
-#            [
-#                "CS-1010", "CS1030", "CS-1400", "CS-1410", "CS-2130", "CS2350", "CS2420",
-#                "CS2450", "CS2550", "CS2705", "CS-2810", "CS3280"
-#            ], {"CS2350", "CS2420", "CS2450", "CS2550", "CS2705", "CS-2810", "CS3280"},
-#            [
-#                "CS2350", "CS2420", "CS2450", "CS2550", "CS2705", "CS-2810", "CS3280",
-#                "CS-3550", "CS-4110"
-#            ]]
-#
-# languages = [["Assembly", "C#", "C++"], ["CSS", "HTML", "JavaScript"], ["Java", "SQL"],
-#              ["Assembly", "C#", "C++", "SQL"],
-#              ["CSS", "HTML", "JavaScript", "Assembly", "C#", "C++"],
-#              ["CSS", "HTML", "JavaScript", "Assembly", "C#", "C++"],
-#              ["CSS", "HTML", "JavaScript", "Java", "SQL"],
-#              ["Java", "SQL", "Assembly", "C#", "C++"],
-#              ["Assembly", "C#", "C++", "CSS", "HTML", "JavaScript", "Java", "SQL"],
-#              ["Assembly", "C#", "C++", "CSS", "HTML", "JavaScript", "Java", "SQL"]]
+courses = [["CS-1010", "CS1030", "CS-1400", "CS-1410"],
+           ["CS-1010", "CS1030", "CS-1400", "CS-1410", "CS-2130", "CS2350"],
+           ["CS-1010", "CS1030", "CS-1400", "CS-1410", "CS-2130", "CS2350"],
+           ["CS-1010", "CS1030", "CS-1400", "CS-1410", "CS-2130", "CS2350"],
+           [
+               "CS-1010", "CS1030", "CS-1400", "CS-1410", "CS-2130", "CS2350", "CS2420",
+               "CS2450", "CS2550", "CS2705"
+           ],
+           [
+               "CS-1010", "CS1030", "CS-1400", "CS-1410", "CS-2130", "CS2350", "CS2420",
+               "CS2450", "CS2550", "CS2705"
+           ],
+           [
+               "CS-1010", "CS1030", "CS-1400", "CS-1410", "CS-2130", "CS2350", "CS2420",
+               "CS2450", "CS2550", "CS2705", "CS-2810", "CS3280"
+           ],
+           [
+               "CS-1010", "CS1030", "CS-1400", "CS-1410", "CS-2130", "CS2350", "CS2420",
+               "CS2450", "CS2550", "CS2705", "CS-2810", "CS3280"
+           ], {"CS2350", "CS2420", "CS2450", "CS2550", "CS2705", "CS-2810", "CS3280"},
+           [
+               "CS2350", "CS2420", "CS2450", "CS2550", "CS2705", "CS-2810", "CS3280",
+               "CS-3550", "CS-4110"
+           ]]
+
+languages = [["Assembly", "C#", "C++"], ["CSS", "HTML", "JavaScript"], ["Java", "SQL"],
+             ["Assembly", "C#", "C++", "SQL"],
+             ["CSS", "HTML", "JavaScript", "Assembly", "C#", "C++"],
+             ["CSS", "HTML", "JavaScript", "Assembly", "C#", "C++"],
+             ["CSS", "HTML", "JavaScript", "Java", "SQL"],
+             ["Java", "SQL", "Assembly", "C#", "C++"],
+             ["Assembly", "C#", "C++", "CSS", "HTML", "JavaScript", "Java", "SQL"],
+             ["Assembly", "C#", "C++", "CSS", "HTML", "JavaScript", "Java", "SQL"]]
 
 # schedules=[{{1, }{}},
 # {}]
@@ -135,6 +135,41 @@ def test_add_courses_to_user():
             for c in courses:
                 u.courses.append(c)
 
+
+def test_create_users_with_data():
+    db.init_app(app)
+
+    print("Generating test users...")
+    with app.app_context():
+        db.drop_all()
+        db.create_all()
+
+        for i in range(len(usernames)):
+
+            # if the email, firstname, lastname, or username given is null, return an error (they are required fields)
+            if all(x is None for x in [emails[i], first_names[i], last_names[i], usernames[i]]):
+                return
+
+            # add the initial user info that isn't related to other tables
+            user = User(
+                email=emails[i],
+                firstname=first_names[i],
+                lastname=last_names[i],
+                username=usernames[i],
+                biography=biography,
+                avatar=avatar
+            )
+            user.hash_password(passwords[i])
+            db.session.add(user)
+
+            test_create_courses()
+            # if the course, language, and role doesn't exist in it's own table, add it
+            # query the course, language, and role into an object based off name
+            # then query the user into an object based off username
+            # then append the courses, languages, and roles to the related class attribute of the user
+
+            db.session.commit()
+            print('')
 
 def test_query_users():
     db.init_app(app)
