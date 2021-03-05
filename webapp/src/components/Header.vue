@@ -13,7 +13,7 @@
         </div>
       </transition>
       <div class="navbar-header">
-        <router-link to="/" class="navbar-brand"><p>Home</p></router-link>
+        <router-link to="/" class="navbar-brand"><div class="navbar_text">Home</div></router-link>
       </div>
       <div>
         <ul class="nav navbar-nav navbar-right">
@@ -21,19 +21,19 @@
             <a href="#" @click="profile">{{ this.$store.state.auth.email }}</a>
           </li>
           <li>
-            <a href ="#" @click="calendar"><p>Calendar</p></a>
+            <a href ="#" @click="calendar"><div class="navbar_text">Calendar</div></a>
           </li>
           <li>
-            <a href ="#" @click="tutors"><p>Tutors</p></a>
+            <a href ="#" @click="tutors"><div class="navbar_text">Tutors</div></a>
           </li>
            <li>
-            <a href ="#" @click="login"><p>Login</p></a>
+            <a href ="#" @click="login"><div class="navbar_text">Login</div></a>
           </li>
            <li>
-            <a href ="#" @click="admintools"><p>Admin Tools</p></a>
+            <a href ="#" @click="admintools"><div class="navbar_text">Admin Tools</div></a>
           </li>
            <li>
-            <a href ="#" @click="manageaccount"><p>Manage Account</p></a>
+            <a href ="#" @click="manageaccount"><div class="navbar_text">Manage Account</div></a>
           </li>
           <li v-show="this.$store.getters.authenticated">
             <a href="#" @click="logOut">Logout</a>
@@ -164,9 +164,10 @@ a
 {
 color: red;
 }
-p
+
+.navbar_text
 {
-color: white;
+color:white;
 }
 
 </style>
